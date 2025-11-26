@@ -4310,7 +4310,7 @@ ${Dinosaur.config.textCustomizeCSS}
                 colorButtonAmazonBackground: "#FF9900",
                 colorButtonAmazonText: "#000",
                 showAmazonButton: false,
-                showAmazonSign: true,
+                showAmazonSign: false,
 
                 floatingRadius: 0,
                 showAmazonSignFloating: false,
