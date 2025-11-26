@@ -611,6 +611,7 @@ typeof window != "undefined" &&
                         "textRating4",
                         "textRating5",
                         "textReviewButton",
+                        "textAmazon",
                         "textReviewRating",
                         "textReviewTitle",
                         "textReviewContent",
@@ -711,6 +712,7 @@ typeof window != "undefined" &&
                         "textRating4",
                         "textRating5",
                         "textReviewButton",
+                        "textAmazon",
                         "textReviewRating",
                         "textReviewTitle",
                         "textReviewContent",
@@ -753,8 +755,7 @@ typeof window != "undefined" &&
             if (
                 !Dinosaur.locale ||
                 !Dinosaur.config.autoTranslateReviews ||
-                (!Dinosaur.isVIPPlan &&
-                    !Dinosaur.isPremiumPlan &&
+                (!Dinosaur.isPremiumPlan &&
                     !Dinosaur.config.allowedOptions?.includes("autoTranslateReviews"))
             )
                 return;
@@ -933,7 +934,7 @@ typeof window != "undefined" &&
                             ${Dinosaur.config.sideBarLinkAllReviews
                                 ? Dinosaur.isUIPreview
                                     ? ` | <span class="ui-ku9vz5jj" ui-qv6rlqls>${Dinosaur.config.textShowAll}</span>`
-                                    : Dinosaur.isVIPPlan || Dinosaur.config.allowedOptions?.includes("featuredLinkAllReviews")
+                                    : Dinosaur.isPremiumPlan || Dinosaur.config.allowedOptions?.includes("featuredLinkAllReviews")
                                         ? ` | <a href=${Dinosaur.config.allReviewsPageUrl || "/pages/reviews"} target="_blank"><span class="ui-ku9vz5jj" ui-qv6rlqls>${Dinosaur.config.textShowAll}</span></a>`
                                         : ""
                                 : ""}` : ""}${Dinosaur.getSvg("amazon")}</div>` : ``}
@@ -1312,20 +1313,21 @@ typeof window != "undefined" &&
                 const _flag = `${country?.toUpperCase() || ""}${backgroundPos ? `<div class="ui-ygphxp0r" style="background-position: ${backgroundPos}"></div>` : ""}`
                 const _date = Dinosaur.config.showReviewDate ? `<div class="ui-jc3w2dn7" data-date="${Dinosaur.xssEscape(review.createdAt)}">${Dinosaur.xssEscape(Dinosaur.formatDate(review.createdAt))}</div>` : ``;
                 const _verified = (review.isVerified || review.purchaseVerified) && Dinosaur.config.showVerifiedBadge ? Dinosaur.buildVerifiedBadge() : "";
+                const _pinned = review.isPinned && Dinosaur.config.showPinnedSign ? Dinosaur.getSvg("pin") : "";
                 const _rating = `${Dinosaur.buildStarRating(review.rating)}`;
                 let _row1 = "",
                     _row2 = "",
                     _row3 = "";
                 if (isCard) {
-                    _row1 = `${_name}${_verified}`;
+                    _row1 = `${_name}${_verified}${_pinned}`;
                     _row2 = `${_flag}<span class="ui-rc1n41ps">•</span>${_date}`;
                     _row3 = `${_rating}`
                 } else if (isSlide) {
-                    _row1 = `${_name}${_verified}`;
+                    _row1 = `${_name}${_verified}${_pinned}`;
                     _row2 = `${_flag}<span class="ui-rc1n41ps">•</span>${_date}`;
                     _row3 = `${_rating}`
                 } else {
-                    _row1 = `${_name}${_verified}`;
+                    _row1 = `${_name}${_verified}${_pinned}`;
                     _row2 = `${_flag}<span class="ui-rc1n41ps">•</span>${_date}`;
                     _row3 = `${_rating}`
                 }
@@ -2078,7 +2080,7 @@ ${Dinosaur.config.textCustomizeCSS}
                     html += `<div class="ui-2x4vqu58 ui-odnfsn0a">${_html}</div>`;
                 }
             } else if (Dinosaur.config.showReviewButton) {
-                html += `<span class="ui-kbm2ft92 ui-er7nmjbb" ui-qv6rlqls>${Dinosaur.config.textReviewButtonNone}</span>`;
+                html += `<span class="ui-kbm2ft92" ui-qv6rlqls>${Dinosaur.config.textReviewButtonNone}</span>`;
             }
             html += "</div>";
             return html;
@@ -2200,7 +2202,7 @@ ${Dinosaur.config.textCustomizeCSS}
                 (Dinosaur.config.showAmazonButton || Dinosaur.config.showReviewButton || true) && (
                     actionButtons += `<div class="ui-63sharny">
                         ${Dinosaur.config.showReviewButton ? `<button type="button" class="ui-bj6l6u41" ui-qv6rlqls>${Dinosaur.getSvg("write", "var(--dinosaur-action-button-color)")}${Dinosaur.config.textReviewButton}</button>` : ``}
-                        ${Dinosaur.config.showAmazonButton ? `<button  onclick="window.open('${Dinosaur.amzURL}', '_blank')" type="button" class="ui-bj6l6u41 amazon" ui-qv6rlqls>${Dinosaur.getSvg("", "var(--dinosaur-button-amazon-color)")}${`View amazon`}</button>` : ``}
+                        ${Dinosaur.config.showAmazonButton && Dinosaur.amzURL ? `<button  onclick="window.open('${Dinosaur.amzURL}', '_blank')" type="button" class="ui-bj6l6u41 amazon" ui-qv6rlqls>${Dinosaur.getSvg("", "var(--dinosaur-button-amazon-color)")}${Dinosaur.config.textAmazon}</button>` : ``}
                     </div>`
                 )
                 Dinosaur.config.allowSortReview &&
@@ -2411,7 +2413,9 @@ ${Dinosaur.config.textCustomizeCSS}
 </path>
         </g>
     </g>
-</svg>` 
+</svg>` : type == "pin" ? `<svg xmlns="http://www.w3.org/2000/svg" width=${width} height=${height} viewBox="0 0 24 24" fill="none">
+<path d="M19.1835 7.80516L16.2188 4.83755C14.1921 2.8089 13.1788 1.79457 12.0904 2.03468C11.0021 2.2748 10.5086 3.62155 9.5217 6.31506L8.85373 8.1381C8.59063 8.85617 8.45908 9.2152 8.22239 9.49292C8.11619 9.61754 7.99536 9.72887 7.86251 9.82451C7.56644 10.0377 7.19811 10.1392 6.46145 10.3423C4.80107 10.8 3.97088 11.0289 3.65804 11.5721C3.5228 11.8069 3.45242 12.0735 3.45413 12.3446C3.45809 12.9715 4.06698 13.581 5.28476 14.8L6.69935 16.2163L2.22345 20.6964C1.92552 20.9946 1.92552 21.4782 2.22345 21.7764C2.52138 22.0746 3.00443 22.0746 3.30236 21.7764L7.77841 17.2961L9.24441 18.7635C10.4699 19.9902 11.0827 20.6036 11.7134 20.6045C11.9792 20.6049 12.2404 20.5358 12.4713 20.4041C13.0192 20.0914 13.2493 19.2551 13.7095 17.5825C13.9119 16.8472 14.013 16.4795 14.2254 16.1835C14.3184 16.054 14.4262 15.9358 14.5468 15.8314C14.8221 15.593 15.1788 15.459 15.8922 15.191L17.7362 14.4981C20.4 13.4973 21.7319 12.9969 21.9667 11.9115C22.2014 10.826 21.1954 9.81905 19.1835 7.80516Z" fill=${color} />
+</svg>`
                                 : `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill=${color} version="1.1" id="Capa_1" width=${width} height=${height} viewBox="0 0 35.418 35.418" xml:space="preserve"><g>
 	<path d="M20.948,9.891c-0.857,0.068-1.847,0.136-2.837,0.269c-1.516,0.195-3.032,0.461-4.284,1.053   c-2.439,0.994-4.088,3.105-4.088,6.209c0,3.898,2.506,5.875,5.669,5.875c1.057,0,1.913-0.129,2.703-0.328   c1.255-0.396,2.31-1.123,3.562-2.441c0.727,0.99,0.923,1.453,2.177,2.509c0.329,0.133,0.658,0.133,0.922-0.066   c0.791-0.659,2.174-1.848,2.901-2.508c0.328-0.267,0.263-0.66,0.066-0.992c-0.727-0.924-1.45-1.718-1.45-3.498v-5.943   c0-2.513,0.195-4.822-1.647-6.537c-1.518-1.391-3.891-1.916-5.735-1.916c-0.264,0-0.527,0-0.792,0   c-3.362,0.197-6.921,1.647-7.714,5.811c-0.13,0.525,0.267,0.726,0.53,0.793l3.691,0.464c0.396-0.07,0.593-0.398,0.658-0.73   c0.333-1.449,1.518-2.176,2.836-2.309c0.067,0,0.133,0,0.265,0c0.79,0,1.646,0.332,2.109,0.987   c0.523,0.795,0.461,1.853,0.461,2.775L20.948,9.891L20.948,9.891z M20.223,17.749c-0.461,0.925-1.253,1.519-2.11,1.718   c-0.131,0-0.327,0.068-0.526,0.068c-1.45,0-2.31-1.123-2.31-2.775c0-2.11,1.254-3.104,2.836-3.565   c0.857-0.197,1.847-0.265,2.836-0.265v0.793C20.948,15.243,21.01,16.43,20.223,17.749z M35.418,26.918v0.215   c-0.035,1.291-0.716,3.768-2.328,5.131c-0.322,0.25-0.645,0.107-0.503-0.254c0.469-1.145,1.541-3.803,1.04-4.412   c-0.355-0.465-1.826-0.43-3.079-0.322c-0.572,0.072-1.075,0.105-1.469,0.183c-0.357,0.033-0.431-0.287-0.071-0.537   c0.466-0.323,0.969-0.573,1.541-0.756c2.039-0.608,4.406-0.25,4.729,0.146C35.348,26.414,35.418,26.629,35.418,26.918z    M32.016,29.428c-0.466,0.357-0.965,0.682-1.468,0.973c-3.761,2.261-8.631,3.441-12.856,3.441c-6.807,0-12.895-2.512-17.514-6.709   c-0.396-0.324-0.073-0.789,0.393-0.539C5.549,29.5,11.709,31.26,18.084,31.26c4.013,0,8.342-0.754,12.463-2.371   c0.285-0.104,0.608-0.252,0.895-0.356C32.087,28.242,32.661,28.965,32.016,29.428z"/>
 </g>
@@ -2984,7 +2988,7 @@ ${Dinosaur.config.textCustomizeCSS}
                     $(Dinosaur.container).append($imgBox);
                     $imgBox.find(".ui-36c8wcbw").click(() => {
                         Dinosaur.config.widgetLayout == "slide" &&
-                        Dinosaur.swiperReviews.autoplay.start();
+                            Dinosaur.swiperReviews.autoplay.start();
                         Dinosaur.stopAllVideo();
                         Dinosaur.hideBackdropBox("#ui-4m0xgc2u");
                     });
@@ -3109,7 +3113,7 @@ ${Dinosaur.config.textCustomizeCSS}
             Dinosaur.isFreePlan = Dinosaur.subscriptionPlan == "Free";
             Dinosaur.isEssentialPlan = Dinosaur.subscriptionPlan == "Essential";
             Dinosaur.isPremiumPlan = Dinosaur.subscriptionPlan == "Premium";
-            Dinosaur.isVIPPlan = Dinosaur.subscriptionPlan == "VIP";
+            // Dinosaur.isVIPPlan = Dinosaur.subscriptionPlan == "VIP";
             Dinosaur.limitReviews = Dinosaur.config.limitReviews || 10000;
             Dinosaur.limitPhoto = Dinosaur.config.limitPhoto;
             const _check =
@@ -3119,17 +3123,13 @@ ${Dinosaur.config.textCustomizeCSS}
                 newEssPlan = _check > +new Date("2024-05-20");
             !Dinosaur.config.limitReviews &&
                 newVIPPlan &&
-                (Dinosaur.limitReviews = Dinosaur.isVIPPlan
+                (Dinosaur.limitReviews = Dinosaur.isPremiumPlan
                     ? 10000
-                    : Dinosaur.isPremiumPlan
-                        ? 500
-                        : 20);
+                    : 20);
             !Dinosaur.config.limitPhoto &&
-                (Dinosaur.limitPhoto = Dinosaur.isVIPPlan
+                (Dinosaur.limitPhoto = Dinosaur.isPremiumPlan
                     ? 50
-                    : Dinosaur.isPremiumPlan
-                        ? 10
-                        : 1);
+                    : 1);
             Dinosaur.pageType =
                 data?.pageType ||
                 window._dinosaurPageType ||
@@ -3159,10 +3159,10 @@ ${Dinosaur.config.textCustomizeCSS}
             Dinosaur.ratings = window._dinosaurRatings;
             Dinosaur.popupReviews = window._dinosaurPopupReviews ?? [];
             Dinosaur.shopName = window._shopName ?? "Sample shop name";
-            Dinosaur.amzURL = window._amzURL || "";
+            Dinosaur.amzURL = data?.amzURL || window._amzURL || "";
             Dinosaur.shopSummary = data?.shopSummary || (window._dinosaurShopSummary ? { rating: (Math.round(window._dinosaurShopSummary.rating * 10) / 10 || -1), total: window._dinosaurShopSummary.total } : {})
             const limitPopupReviews = Dinosaur.config.limitPopupReviews ??
-                (Dinosaur.isVIPPlan ? 100 : Dinosaur.isPremiumPlan ? 10 : 2);
+                (Dinosaur.isPremiumPlan ? 100 : 2);
             limitPopupReviews < Dinosaur.popupReviews?.length && (
                 Dinosaur.popupReviews = Dinosaur.popupReviews.slice(0, limitPopupReviews)
             );
@@ -3188,7 +3188,7 @@ ${Dinosaur.config.textCustomizeCSS}
                 }
                 const limitFeaturedReviews =
                     Dinosaur.config.limitFeaturedReviews ??
-                    (Dinosaur.isVIPPlan ? 100 : Dinosaur.isPremiumPlan ? 10 : 2);
+                    (Dinosaur.isPremiumPlan ? 100 : 2);
                 limitFeaturedReviews < Dinosaur.featuredReviews.length &&
                     (Dinosaur.featuredReviews = Dinosaur.featuredReviews.slice(
                         0,
@@ -3296,7 +3296,7 @@ ${Dinosaur.config.textCustomizeCSS}
                     }
                     $sidebar.click(() => {
                         Dinosaur.config.sidebarLinkAllReviews &&
-                            (Dinosaur.isVIPPlan ||
+                            (Dinosaur.isPremiumPlan ||
                                 Dinosaur.config.allowedOptions?.includes("sidebarLinkAllReviews"))
                             ? (location.href = "/pages/dinosaur-reviews")
                             : Dinosaur.showAllReviews();
@@ -3552,11 +3552,11 @@ ${Dinosaur.config.textCustomizeCSS}
                                     ? ""
                                     : `--dinosaur-star-size:calc(${fontSize}*1.1);`
                                 }margin-left: ${marginLeft}; padding-left: ${paddingLeft};" class="ui-bju4qg94" data-rating="${(
-                                    (ratings[handle].groupAverage > 0 && Dinosaur.isVIPPlan
+                                    (ratings[handle].groupAverage > 0 && Dinosaur.isPremiumPlan
                                         ? ratings[handle].groupAverage
                                         : ratings[handle].rating) + ""
                                 ).replace(",", ".")}" data-raters="${(
-                                    (ratings[handle].groupAverage > 0 && Dinosaur.isVIPPlan
+                                    (ratings[handle].groupAverage > 0 && Dinosaur.isPremiumPlan
                                         ? ratings[handle].groupTotal
                                         : ratings[handle].raters) + ""
                                 )
@@ -3943,7 +3943,6 @@ ${Dinosaur.config.textCustomizeCSS}
         },
 
         buildReviewsWidget: (parent) => {
-            console.log(1, Dinosaur.config.widgetLayout);
             if (!Dinosaur.isUIPreview && Dinosaur.renderWidget) return;
             let widget = $(".ui-aarxyted").first();
             if (Dinosaur.config.showBody || Dinosaur.config.showHeader) {
@@ -4120,7 +4119,7 @@ ${Dinosaur.config.textCustomizeCSS}
                     Dinosaur.isAllReviewsPage = $(".ui-aarxyted[extension]").length && !Dinosaur.data?.productId;
                     if (Dinosaur.isAllReviewsPage) {
                         if (
-                            Dinosaur.isVIPPlan ||
+                            Dinosaur.isPremiumPlan ||
                             Dinosaur.config.allowedOptions?.includes("featuredLinkAllReviews") ||
                             Dinosaur.config.allowedOptions?.includes("sidebarLinkAllReviews")
                         ) {
@@ -4239,9 +4238,10 @@ ${Dinosaur.config.textCustomizeCSS}
                 colorButtonBackground: "#000",
                 textCustomizeCSS: "",
                 textReviewDateFormat: "MMM DD, YYYY",
+                showPinnedSign: false,
 
                 sidebarBackground: "#ffffff",
-                sidebarCaptionColor: MAIN_COLOR,
+                sidebarCaptionColor: "#000",
                 sideBarShowReviewsCount: true,
                 sideBarLinkAllReviews: false,
                 sidebarDisplayType: "popup",
@@ -4458,7 +4458,8 @@ ${Dinosaur.config.textCustomizeCSS}
                 textFeaturedTitle: "What our customers think",
                 tabTitle: "What our customers think",
                 textReviewButton: "Write a review",
-                textReviewButtonNone: "Be first leave a review",
+                textAmazon: "View amazon",
+                textReviewButtonNone: "Leave a review",
                 textShopReply: "Replied:",
                 textReviewSummary: "Based on {{reviews_count}} {{reviews}}",
                 textReviewerName: "Your name",
@@ -4887,6 +4888,7 @@ const buildPreviewUI = ({
             isFeaturedWidget,
             subscriptionPlan,
             pageType: "product",
+            amzURL: "https://www.amazon.com/",
             data: {
                 page: 1,
                 filter: "all",
