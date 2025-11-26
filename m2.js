@@ -2423,10 +2423,10 @@ ${Dinosaur.config.textCustomizeCSS}
         },
         generateAvatarName: (fullName) => {
             const initials = fullName
-                .split(' ')
-                .map(word => word[0].toUpperCase())
-                .slice(0, 2)
-                .join('');
+                ?.split(' ')
+                ?.map(word => word[0].toUpperCase())
+                ?.slice(0, 2)
+                ?.join('');
             return initials;
         },
         buildReviewForm: () => {
