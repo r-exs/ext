@@ -3245,7 +3245,7 @@ ${Dinosaur.config.textCustomizeCSS}
             Dinosaur.loadSwiper();
             Dinosaur.loadLazyLoad();
             Dinosaur.checkDinosaurReady(action);
-            Dinosaur.deleteScript();
+            // Dinosaur.deleteScript();
         },
 
         checkWidgetMargin: () => {
