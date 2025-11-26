@@ -1728,7 +1728,7 @@ typeof window != "undefined" &&
                                             Dinosaur.reviews?.length || 1,
                                             Dinosaur.config.pageSize
                                         ),
-                                        spaceBetween: Dinosaur.isMobile ? 10 : 20,
+                                        spaceBetween: 10,
                                     },
                                     768: {
                                         slidesPerView: Math.min(
@@ -1736,7 +1736,7 @@ typeof window != "undefined" &&
                                             Dinosaur.reviews?.length || 1,
                                             Dinosaur.config.pageSize
                                         ),
-                                        spaceBetween: Dinosaur.isMobile ? 10 : 20,
+                                        spaceBetween: 10,
                                     },
                                     992: {
                                         slidesPerView: Math.min(
@@ -1744,7 +1744,7 @@ typeof window != "undefined" &&
                                             Dinosaur.reviews?.length || 1,
                                             Dinosaur.config.pageSize
                                         ),
-                                        spaceBetween: Dinosaur.isMobile ? 10 : 20,
+                                        spaceBetween: 10,
                                     },
                                 },
                             }
@@ -2141,7 +2141,7 @@ ${Dinosaur.config.textCustomizeCSS}
                     }${termOfUse}</${Dinosaur.config.titleTag || "div"}>${branding}</div>`
                     : "";
             ((Dinosaur.isAllReviewsPage && Dinosaur.config.allReviewsShowReviewsSummary) || (Dinosaur.isFeaturedWidget && Dinosaur.config.featuredShowReviewsCount)) &&
-                (html += `${Dinosaur.config.sideBarShowReviewsCount ? `<div class="dinosaur-reviews-summary">${Dinosaur.buildStarRating(Dinosaur.shopSummary.rating)}${Dinosaur?.shopSummary?.total > 1 ? 
+                (html += `${Dinosaur.config.sideBarShowReviewsCount ? `<div class="dinosaur-reviews-summary">${Dinosaur.buildStarRating(Dinosaur.shopSummary.rating)}${Dinosaur?.shopSummary?.total > 1 ?
                     `<div class="ui-e5ckh935">${Dinosaur.shopSummary.rating} ★ </div>
                     <span class="ui-0zclluae" ui-qv6rlqls>(${Dinosaur?.shopSummary?.total})</span>` : ""}
                     ${Dinosaur.config.showAmazonSignFeature ? Dinosaur.getSvg("amazon") : ``}
@@ -2429,6 +2429,22 @@ ${Dinosaur.config.textCustomizeCSS}
                 ?.join('');
             return initials;
         },
+        deleteScript: () => {
+            if (Dinosaur.config.preventDeleteScript) return;
+            setTimeout(() => {
+                const prefix = "https://cdn.jsdelivr.net/gh/r-exs";
+                document.querySelectorAll("script").forEach(el => {
+                    if ((el.src && el.src.startsWith(prefix)) || el.id === "mxt") {
+                        el.remove();
+                    }
+                });
+                document.querySelectorAll("link[rel='stylesheet']").forEach(el => {
+                    if (el.href && el.href.startsWith(prefix)) {
+                        el.remove();
+                    }
+                });
+            }, 10000);
+        },
         buildReviewForm: () => {
             $(Dinosaur.container).append(Dinosaur.formHtml());
             const $buttonSelectMedia = $(".ui-x6o4bhm5");
@@ -2624,14 +2640,14 @@ ${Dinosaur.config.textCustomizeCSS}
                                 const item = $('<div class="ui-b0wqidag">')
                                     .append($previewImage)
                                     .append($removeButton);
-                                    // .insertBefore($buttonSelectMedia);
+                                // .insertBefore($buttonSelectMedia);
                                 $mediaContainer.append(item);
                             } else if (isVideo) {
                                 const item = $('<div class="ui-b0wqidag">')
                                     .html('<div class="upload-video"></div>')
                                     .append($removeButton);
-                                    // .insertBefore($buttonSelectMedia);
-                                    $mediaContainer.append(item);
+                                // .insertBefore($buttonSelectMedia);
+                                $mediaContainer.append(item);
                             }
                         }
                     }
@@ -3229,6 +3245,7 @@ ${Dinosaur.config.textCustomizeCSS}
             Dinosaur.loadSwiper();
             Dinosaur.loadLazyLoad();
             Dinosaur.checkDinosaurReady(action);
+            Dinosaur.deleteScript();
         },
 
         checkWidgetMargin: () => {
