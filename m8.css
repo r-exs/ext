@@ -2744,9 +2744,10 @@ a:active {
   justify-content: center;
   font-family: Arial, sans-serif;
   text-transform: uppercase;
+  min-width: 45px;
 }
 
-.ui-97vf7t41 svg {
+.ui-97vf7t41 svg:not(.ai_amz) {
   position: absolute;
   bottom: -5px;
   right: 0;
